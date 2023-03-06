@@ -47,7 +47,7 @@ class RegistrationController {
     q=[];
   cron = () => {
     const cronJob = require('node-cron');
-        cronJob.schedule('* * * * *', () => {
+        cronJob.schedule('0 0 0 * * *', () => {
         this.setArchive();
 })
   }
