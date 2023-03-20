@@ -1589,7 +1589,8 @@ setArchive=async (req, res, next) => {
     }
     deleted = async (req, res, next) => {
         let models = await ModelModel.findAll();
-        if(models.length > 0){
+        let arxiv = await Registration_arxivModel.findAll();
+        if(models.length > 0 || arxiv.length > 0) {
             for(let i = 0; i <= models.length; i++){
                 if(models[i] != undefined){
                     await QueueModel.destroy({
