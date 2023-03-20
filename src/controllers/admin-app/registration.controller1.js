@@ -108,7 +108,7 @@ setArchive=async (req, res, next) => {
        // res.send('okey');
    };
     getAll = async (req, res, next) => {
-       await this.cron();
+    //    await this.cron();
         const model = await ModelModel.findAll({
             include:[ 
                 {
