@@ -42,6 +42,11 @@ const moment = require('moment');
 const register_mkb = require('../../models/register_mkb.model');
 const med_directModel = require('../../models/med_direct.model');
 const db = require('../../db/db-sequelize');
+const Registration_arxivModel = require('../../models/registration_arxiv.model');
+const register_doctor_arxivModel = require('../../models/register_doctor_arxiv.model');
+const register_inspection_arxivModel = require('../../models/register_inspection_arxiv.model');
+const register_kassa_arxivModel = require('../../models/register_kassa_arxiv.model');
+const register_mkb_arxivModel = require('../../models/register_mkb_arxiv.model');
 
 class RegistrationController {
     q=[];
@@ -1653,6 +1658,61 @@ setArchive=async (req, res, next) => {
                         }
                     })
                     await ModelModel.destroy({ 
+                        where:{
+                          id: models[i].dataValues.id
+                        }
+                    });
+                      await Registration_doctor_arxivModel.destroy({
+                        where:{
+                            registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_files_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_inspection_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_inspection_child_arxxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await register_inspection_arxivModel.destroy({
+                        where:{
+                            doc_id: models[i].dataValues.id
+                        }
+                      })
+                      await register_doctor_arxivModel.destroy({
+                        where:{
+                            doc_id: models[i].dataValues.id
+                        }
+                      })
+                      await register_mkb_arxivModel.destroy({
+                        where:{
+                            registration_id: models[i].dataValues.id
+                        }
+                      })
+                      await Registration_pay_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_recipe_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await register_kassa_arxivModel.destroy({
+                        where:{
+                            doctor_id: models[i].dataValues.id
+                        }
+                    })
+                    await Registration_arxivModel.destroy({ 
                         where:{
                           id: models[i].dataValues.id
                         }
