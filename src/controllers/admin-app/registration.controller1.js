@@ -47,7 +47,7 @@ class RegistrationController {
     q=[];
   cron = () => {
     const cronJob = require('node-cron');
-        cronJob.schedule('0 0 0 * * *', () => {
+        cronJob.schedule('* * * * * *', () => {
         this.setArchive();
 })
   }
@@ -59,7 +59,7 @@ setArchive=async (req, res, next) => {
         }
      });
     if(qarz.length > 0){
-        let sum =  qarz.every(item => item.backlog <= 0);
+        let sum =  qarz.some(item => item.backlog <= 0);
         console.log(sum, "summmmmmm");
         if(sum){
             await db.query("INSERT INTO registration_inspection_child_arxiv SELECT * FROM registration_inspection_child");
@@ -82,8 +82,8 @@ setArchive=async (req, res, next) => {
             await db.query("DELETE from registration_recipe");
             await db.query("INSERT INTO registration_doctor_arxiv SELECT * FROM registration_doctor");
             await db.query("DELETE from registration_doctor");
-            await db.query("INSERT INTO registration_arxiv SELECT * FROM registration");
-            await db.query("DELETE from registration");
+            await db.query("INSERT INTO registration_arxiv SELECT * FROM registration where backlog = 0");
+            await db.query("DELETE from registration where backlog = 0");
             await db.query("INSERT INTO registration_pay_arxiv SELECT * FROM registration_pay");
             await db.query("DELETE from registration_pay");
             await db.query("INSERT INTO registration_palata_arxiv SELECT * FROM registration_palata");
