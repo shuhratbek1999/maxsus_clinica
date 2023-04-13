@@ -42,12 +42,17 @@ const moment = require('moment');
 const register_mkb = require('../../models/register_mkb.model');
 const med_directModel = require('../../models/med_direct.model');
 const db = require('../../db/db-sequelize');
+const Registration_arxivModel = require('../../models/registration_arxiv.model');
+const register_doctor_arxivModel = require('../../models/register_doctor_arxiv.model');
+const register_inspection_arxivModel = require('../../models/register_inspection_arxiv.model');
+const register_kassa_arxivModel = require('../../models/register_kassa_arxiv.model');
+const register_mkb_arxivModel = require('../../models/register_mkb_arxiv.model');
 
 class RegistrationController {
     q=[];
   cron = () => {
     const cronJob = require('node-cron');
-        cronJob.schedule('0 0 * * *', () => {
+        cronJob.schedule('*/3 * * * *', () => {
         this.setArchive();
 })
   }
@@ -60,7 +65,7 @@ setArchive=async (req, res, next) => {
         }
      });
     if(qarz.length > 0){
-        let sum =  qarz.every(item => item.backlog <= 0);
+        let sum =  qarz.some(item => item.backlog <= 0);
         if(sum){
             await db.query("INSERT INTO registration_inspection_child_arxiv SELECT * FROM registration_inspection_child");
             await db.query("DELETE from registration_inspection_child");
@@ -82,8 +87,8 @@ setArchive=async (req, res, next) => {
             await db.query("DELETE from registration_recipe");
             await db.query("INSERT INTO registration_doctor_arxiv SELECT * FROM registration_doctor");
             await db.query("DELETE from registration_doctor");
-            await db.query("INSERT INTO registration_arxiv SELECT * FROM registration");
-            await db.query("DELETE from registration");
+            await db.query("INSERT INTO registration_arxiv SELECT * FROM registration where backlog = 0");
+            await db.query("DELETE from registration where backlog = 0");
             await db.query("INSERT INTO registration_pay_arxiv SELECT * FROM registration_pay");
             await db.query("DELETE from registration_pay");
             await db.query("INSERT INTO registration_palata_arxiv SELECT * FROM registration_palata");
@@ -155,7 +160,7 @@ arxive = async(req, res, next) => {
        }
 }
     getAll = async (req, res, next) => {
-       await this.cron();
+    //    await this.cron();
         const model = await ModelModel.findAll({
             include:[ 
                 {
@@ -1636,7 +1641,8 @@ arxive = async(req, res, next) => {
     }
     deleted = async (req, res, next) => {
         let models = await ModelModel.findAll();
-        if(models.length > 0){
+        let arxiv = await Registration_arxivModel.findAll();
+        if(models.length > 0 || arxiv.length > 0) {
             for(let i = 0; i <= models.length; i++){
                 if(models[i] != undefined){
                     await QueueModel.destroy({
@@ -1705,6 +1711,61 @@ arxive = async(req, res, next) => {
                         }
                     })
                     await ModelModel.destroy({ 
+                        where:{
+                          id: models[i].dataValues.id
+                        }
+                    });
+                      await Registration_doctor_arxivModel.destroy({
+                        where:{
+                            registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_files_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_inspection_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_inspection_child_arxxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await register_inspection_arxivModel.destroy({
+                        where:{
+                            doc_id: models[i].dataValues.id
+                        }
+                      })
+                      await register_doctor_arxivModel.destroy({
+                        where:{
+                            doc_id: models[i].dataValues.id
+                        }
+                      })
+                      await register_mkb_arxivModel.destroy({
+                        where:{
+                            registration_id: models[i].dataValues.id
+                        }
+                      })
+                      await Registration_pay_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await Registration_recipe_arxivModel.destroy({
+                        where:{
+                         registration_id: models[i].dataValues.id
+                        }
+                       })
+                       await register_kassa_arxivModel.destroy({
+                        where:{
+                            doctor_id: models[i].dataValues.id
+                        }
+                    })
+                    await Registration_arxivModel.destroy({ 
                         where:{
                           id: models[i].dataValues.id
                         }
